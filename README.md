@@ -126,6 +126,13 @@ This repo produces:
 
 ---
 
+## 🙏 Acknowledgments
+
+This project was made possible with data and technical guidance provided by [**Hoseyn Amiri**](https://www.sulchek2.gatech.edu/people/graduate/hoseyn-amiri/), a graduate researcher in the [Sulchek Lab](https://www.sulchek2.gatech.edu/) at Georgia Tech.  
+Hoseyn's mentorship shaped the approach to annotation standards, mask generation, and tool development used throughout this work.
+
+---
+
 ## 📄 License
 
 This project is intended for academic and research use.  
