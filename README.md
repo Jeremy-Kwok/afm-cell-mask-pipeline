@@ -110,12 +110,11 @@ This repo produces:
 
 ---
 
-## 🧪 Example visual (from assets/)
+## 🧪 Example visual (from `data_samples/`)
 
 | Raw Image | Overlay Output |
 |-----------|----------------|
-| ![raw](assets/cell01meas0000.png) | ![overlay](assets/cell01meas0000_overlay.png) |
-
+| ![raw](data_samples/DN1-rapid/cell01meas0000.tif) | ![overlay](data_samples/DN1-rapid/overlays/cell01meas0000_overlay.png) |
 ---
 
 ## 📁 Notes on data
