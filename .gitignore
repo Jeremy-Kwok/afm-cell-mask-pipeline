@@ -22,8 +22,9 @@ masks/
 overlays/
 *.tif  # ensure raw images are ignored
 
-# ALLOW curated PUBLIC SAMPLES ONLY
+# ALLOW curated PUBLIC SAMPLES ONLY (including .tif)
 !data_samples/
+!data_samples/**/*.tif
 !data_samples/**/masks/**
 !data_samples/**/overlays/**
 
