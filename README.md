@@ -19,18 +19,25 @@ Manual segmentation is slow and inconsistent. This pipeline standardizes mask ge
 
 ```
 afm_cell_training/
-├── code/              # Scripts (inspect → masks → overlays → summary)
-├── data/              # Full datasets (gitignored)
-│   └── DN*/           # Raw image folders for rapid/rate/force
-├── data_samples/      # Public preview dataset (committed)
-├── masks/             # Generated binary masks (gitignored)
-├── overlays/          # Masked overlay images (gitignored)
-├── results/           # Summary CSVs, analysis artifacts
-├── assets/            # Thumbnails for README or documentation
+├── code/                   # scripts (inspect → masks → overlays → summary)
+├── data_full/              # full datasets (gitignored)
+│   └── DN1-rapid/
+│       ├── *.tif           # raw AFM image frames
+│       ├── annotations/    # human-drawn JSON annotations
+│       ├── masks/          # generated binary masks (auto)
+│       └── overlays/       # visual overlays (image + mask)
+├── data_samples/           # curated public samples (committed)
+│   ├── DN1-rapid/
+│   │   ├── masks/
+│   │   └── overlays/
+│   └── DN1-rate/
+│       ├── masks/
+│       └── overlays/
+├── results/                # includes mask_summary.csv
 ├── .gitignore
 ├── README.md
-├── requirements.txt   # Environment dependencies (pip)
-├── pyproject.toml     # Environment/project metadata (uv or poetry)
+├── requirements.txt
+└── pyproject.toml
 ```
 
 ---
@@ -63,7 +70,7 @@ uv pip install -r requirements.txt
 
 ## ▶️ How to run (full local data)
 
-This assumes you've extracted all data into the `data/` folder:
+This assumes you've extracted all datasets into the `data_full/` folder:
 
 ```bash
 python code/01_inspect_dataset.py
@@ -74,8 +81,8 @@ python code/04_summarize_masks.py
 
 This will populate:
 
-- `masks/` with generated binary masks  
-- `overlays/` with annotated overlays  
+- `data_full/**/masks/` with generated binary masks  
+- `data_full/**/overlays/` with annotated overlays  
 - `results/mask_summary.csv` with dataset stats
 
 ---
@@ -114,8 +121,6 @@ This repo produces:
 ## 📁 Notes on data
 
 > ⚠️ Raw `.tif` image files are **not included** in this repo due to size.
->
-> If you are a collaborator and need the full datasets, please contact the author or use the shared Dropbox folder.
 
 ---
 
