@@ -1,0 +1,9 @@
+dataset,masks_written,manual_in_json,exclude_in_json
+DN1-rapid,26,26,78
+DN1-rate,24,24,80
+DN2-rapid,26,26,75
+DN2-rate,27,27,80
+DN3-rapid,30,30,77
+DN3-rate,27,27,81
+DN4-rapid,29,29,87
+DN4-rate,30,30,87

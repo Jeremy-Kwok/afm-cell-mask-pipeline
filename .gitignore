@@ -1,0 +1,33 @@
+# ─── ENVIRONMENTS / PYTHON BUILD ─────────────────────────────────────────────
+.venv/
+.uv/
+__pycache__/
+*.pyc
+*.pyo
+uv.lock
+.env
+
+# ─── EDITORS / OS FILES ──────────────────────────────────────────────────────
+.vscode/
+.DS_Store
+
+# ─── LOGS / CACHES ───────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.cache
+*.ipynb_checkpoints
+
+# ─── RAW DATA AND HEAVY FILES ────────────────────────────────────────────────
+data/
+masks/
+overlays/
+*.tif  # comment this out if you want tif images in assets or samples
+
+# ─── ALLOW CURATED PUBLIC SAMPLES ────────────────────────────────────────────
+!data_samples/
+!data_samples/**/masks/**
+!data_samples/**/overlays/**
+
+# ─── TRACK SMALL RESULTS (like summary CSVs) ─────────────────────────────────
+# mask_summary.csv lives here
+!results/
