@@ -114,7 +114,8 @@ This repo produces:
 
 | Raw Image | Overlay Output |
 |-----------|----------------|
-| ![raw](data_samples/DN1-rapid/cell01meas0000.tif) | ![overlay](data_samples/DN1-rapid/overlays/cell01meas0000_overlay.png) |
+| ![raw](data_samples/DN1-rapid/cell01meas0000.png) | ![overlay](data_samples/DN1-rapid/overlays/cell01meas0000_overlay.png) |
+| ![raw](data_samples/DN1-rate/cell01meas0000.png) | ![overlay](data_samples/DN1-rate/overlays/cell01meas0000_overlay.png) |
 ---
 
 ## 📁 Notes on data
