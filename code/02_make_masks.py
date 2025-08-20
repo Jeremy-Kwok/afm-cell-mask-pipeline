@@ -1,5 +1,5 @@
 """
-02_make_masks_hoseyn.py
+02_make_masks.py
 Generate binary masks from annotation JSONs for both RAPID and RATE datasets.
 
 - RAPID:
@@ -24,7 +24,7 @@ import numpy as np
 import cv2
 
 # ---------------- Config ----------------
-DATA_DIR      = Path("data")
+DATA_DIR      = Path("data_full")
 MASKS_ROOT    = Path("masks")
 OVERLAYS_ROOT = Path("overlays")
 OVERLAYS      = True           # write a small sample of overlays

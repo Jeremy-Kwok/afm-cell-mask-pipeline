@@ -74,7 +74,7 @@ This assumes you've extracted all datasets into the `data_full/` folder:
 
 ```bash
 python code/01_inspect_dataset.py
-python code/02_make_masks_hoseyn.py
+python code/02_make_masks.py
 python code/03_overlay_examples.py
 python code/04_summarize_masks.py
 ```
@@ -93,7 +93,7 @@ Run on public sample data:
 
 ```bash
 python code/01_inspect_dataset.py data_samples
-python code/02_make_masks_hoseyn.py data_samples
+python code/02_make_masks.py data_samples
 python code/03_overlay_examples.py data_samples
 python code/04_summarize_masks.py data_samples
 ```

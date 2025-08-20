@@ -1,49 +1,57 @@
-"""
-03_overlay_examples.py
-Creates overlay images showing raw TIFs with masks overlaid for visual sanity check.
-"""
-
 import os
 import cv2
-import glob
+import numpy as np
 
-DATA_DIR = "data"
-MASKS_DIR = "masks"
-OVERLAYS_DIR = "overlays"
+DATA_ROOT = "data_full"
 
-os.makedirs(OVERLAYS_DIR, exist_ok=True)
+def generate_overlay(image, mask):
+    overlay = image.copy()
+    overlay[mask > 0] = [255, 0, 0]  # red mask overlay
+    blended = cv2.addWeighted(image, 0.7, overlay, 0.3, 0)
+    return blended
 
-def overlay():
-    for dataset in sorted(os.listdir(DATA_DIR)):
-        ds_path = os.path.join(DATA_DIR, dataset)
-        if not os.path.isdir(ds_path) or not dataset.endswith(("rapid", "rate")):
+for dataset in sorted(os.listdir(DATA_ROOT)):
+    mask_dir = os.path.join(DATA_ROOT, dataset, "masks")
+    overlay_dir = os.path.join(DATA_ROOT, dataset, "overlays")
+    image_dir = os.path.join(DATA_ROOT, dataset)
+
+    print(f"[check] Dataset: {dataset}")
+    if not os.path.exists(mask_dir):
+        print(f"[skip] No mask dir: {mask_dir}")
+        continue
+
+    os.makedirs(overlay_dir, exist_ok=True)
+    mask_files = sorted(f for f in os.listdir(mask_dir) if f.endswith("_mask.png"))
+    if not mask_files:
+        print(f"[skip] No mask files in: {mask_dir}")
+        continue
+
+    for mask_file in mask_files:
+        base = mask_file.replace("_mask.png", "")
+        mask_path = os.path.join(mask_dir, mask_file)
+        image_path = os.path.join(image_dir, f"{base}.tif")
+        overlay_path = os.path.join(overlay_dir, f"{base}_overlay.png")
+
+        print(f"[debug] Processing {base}...")
+
+        if not os.path.exists(image_path):
+            print(f"  [missing] Image not found: {image_path}")
             continue
 
-        mask_dir = os.path.join(MASKS_DIR, dataset)
-        if not os.path.exists(mask_dir):
-            print(f"[skip] no masks in {dataset}")
-            continue
-
-        out_dir = os.path.join(OVERLAYS_DIR, dataset)
-        os.makedirs(out_dir, exist_ok=True)
-
-        tifs = glob.glob(os.path.join(ds_path, "*.tif"))
-        count = 0
-        for tif in tifs[:20]:  # limit to 20 examples
-            base = os.path.splitext(os.path.basename(tif))[0]
-            mask_file = os.path.join(mask_dir, base + "_mask.png")
-            if not os.path.exists(mask_file):
+        try:
+            image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+            if image is None:
+                print(f"  [fail] Could not read image: {image_path}")
                 continue
 
-            img = cv2.imread(tif)
-            mask = cv2.imread(mask_file, cv2.IMREAD_GRAYSCALE)
-            overlay = img.copy()
-            overlay[mask > 0] = (0, 0, 255)  # red mask overlay
-            out_file = os.path.join(out_dir, base + "_overlay.png")
-            cv2.imwrite(out_file, overlay)
-            count += 1
+            mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+            if mask is None:
+                print(f"  [fail] Could not read mask: {mask_path}")
+                continue
 
-        print(f"[ok] {dataset}: wrote {count} overlays to {out_dir}")
-
-if __name__ == "__main__":
-    overlay()
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+            overlay = generate_overlay(image_rgb, mask)
+            cv2.imwrite(overlay_path, overlay)
+            print(f"  [ok] Wrote overlay: {overlay_path}")
+        except Exception as e:
+            print(f"  [error] Failed to process {base}: {e}")

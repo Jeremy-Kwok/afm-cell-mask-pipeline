@@ -6,7 +6,7 @@ Quickly scans the data directory and lists the datasets, image counts, and annot
 import os
 import glob
 
-DATA_DIR = "data"
+DATA_DIR = "data_full"
 
 def inspect():
     datasets = sorted(os.listdir(DATA_DIR))
