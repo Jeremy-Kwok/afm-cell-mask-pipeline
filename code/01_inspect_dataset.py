@@ -14,7 +14,13 @@ def inspect():
         ds_path = os.path.join(DATA_DIR, ds)
         if os.path.isdir(ds_path):
             tifs = glob.glob(os.path.join(ds_path, "*.tif"))
-            jsons = glob.glob(os.path.join(ds_path, "*.json"))
+            
+            # count annotation jsons in all expected places:
+            jsons = []
+            jsons += glob.glob(os.path.join(ds_path, "*.json"))                                 # root
+            jsons += glob.glob(os.path.join(ds_path, "annotations", "*.json"))                  # dataset/annotations/
+            jsons += glob.glob(os.path.join(DATA_DIR, f"{ds}_annotations", "*.json"))           # DN*-rate_annotations/
+
             print(f"{ds}: {len(tifs)} images, {len(jsons)} jsons")
 
 if __name__ == "__main__":

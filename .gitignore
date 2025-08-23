@@ -30,3 +30,7 @@ overlays/
 
 # TRACK SMALL RESULTS (like summary CSVs)
 results/
+
+# training exports
+afm_dataset/
+afm_dataset.zip

@@ -32,7 +32,7 @@ USE_VD_FILTER = False          # if True (rapid only), require vd_annotations[ke
 SAMPLE_OVERLAYS_PER_SET = 12   # cap overlays per dataset
 
 TUPLE_KEY_RE = re.compile(r"\('(\d+)',\s*'(\d+)'\)")  # matches "('03','0001')"
-IMG_EXTS = {".tif",".tiff",".png",".jpg",".jpeg"}
+IMG_EXTS = {".tif", ".tiff"}
 
 # -------------- Helpers -----------------
 def ensure_dir(p: Path) -> None:
@@ -55,11 +55,31 @@ def rasterize_mask(h: int, w: int, polygons) -> np.ndarray:
 
 def find_images(folder: Path):
     for p in folder.iterdir():
-        if p.is_file() and p.suffix.lower() in IMG_EXTS:
-            yield p
+        if not p.is_file():
+            continue
+        if p.suffix.lower() not in IMG_EXTS:
+            continue
+        if "overlay" in p.stem.lower():
+            continue
+        yield p
 
-def index_images_by_stem(folder: Path):
-    return {p.stem.lower(): p for p in find_images(folder)}
+
+# ONLY TAKE .tif/.tiff files not in masks/ or overlays/
+def index_images_by_stem(img_folder: Path) -> dict[str, Path]:
+    allowed = {".tif", ".tiff"}
+    idx: dict[str, Path] = {}
+    for img_path in sorted(img_folder.iterdir()):
+        if not img_path.is_file():
+            continue
+        if img_path.suffix.lower() not in allowed:
+            continue
+        if img_path.parent.name in ("masks", "overlays"):
+            continue
+        if "overlay" in img_path.stem.lower():
+            continue
+        idx[img_path.stem.lower()] = img_path
+    return idx
+
 
 # ---- Rapid-specific image chooser (by cell, then meas) ----
 def list_images_for_cell(folder: Path, cell_str: str):
@@ -116,13 +136,26 @@ def choose_rate_image(stem: str, idx: dict):
 # -------------- Processors ----------------
 def process_rapid(ds_folder: Path):
     dataset = ds_folder.name   # e.g. DN1-rapid
-    im_path = ds_folder / f"{dataset}_im_annotations.json"
-    vd_path = ds_folder / f"{dataset}_vd_annotations.json"
-    im_ann  = load_json(im_path) or {}
-    vd_ann  = load_json(vd_path) if (USE_VD_FILTER and vd_path.exists()) else None
+    
+    # NEW
+    im_path_root = ds_folder / f"{dataset}_im_annotations.json"
+    im_path_alt  = next(iter((ds_folder / "annotations").glob("*_im_annotations.json")), None)
+    im_path      = im_path_root if im_path_root.exists() else im_path_alt
+    if not im_path:
+        print(f"[skip] no annotations for {dataset}")
+        return
+    im_ann = load_json(im_path) or {}
 
-    mask_dir = MASKS_ROOT / dataset;     ensure_dir(mask_dir)
-    ov_dir   = OVERLAYS_ROOT / dataset;  ensure_dir(ov_dir) if OVERLAYS else None
+    vd_path_root = ds_folder / f"{dataset}_vd_annotations.json"
+    vd_path_alt  = next(iter((ds_folder / "annotations").glob("*_vd_annotations.json")), None)
+    vd_path      = vd_path_root if vd_path_root.exists() else vd_path_alt
+    vd_ann       = load_json(vd_path) if (USE_VD_FILTER and vd_path and vd_path.exists()) else None
+
+    # write outputs inside the dataset folder
+    mask_dir = ds_folder / "masks"
+    ensure_dir(mask_dir)
+    ov_dir   = ds_folder / "overlays"
+    ensure_dir(ov_dir)
 
     made = miss = skip = manual = 0
     ov_written = 0
@@ -166,21 +199,29 @@ def process_rapid(ds_folder: Path):
 
 def process_rate(img_folder: Path):
     dataset = img_folder.name   # e.g. DN1-rate
-    ann_folder = img_folder.parent / f"{dataset}_annotations"
-    # Prefer *_im_annotations.json
-    ann_path = next(iter(ann_folder.glob("*_im_annotations.json")), None)
-    if not ann_path:
-        # fallback to any json
-        ann_path = next(iter(ann_folder.glob("*.json")), None)
+
+    # NEW
+    ann_folder1 = img_folder.parent / f"{dataset}_annotations"
+    ann_folder2 = img_folder / "annotations"
+
+    ann_path = next(iter(ann_folder1.glob("*_im_annotations.json")), None) if ann_folder1.exists() else None
+    if not ann_path and ann_folder1.exists():
+        ann_path = next(iter(ann_folder1.glob("*.json")), None)
+    if not ann_path and ann_folder2.exists():
+        ann_path = next(iter(ann_folder2.glob("*_im_annotations.json")), None) \
+                or next(iter(ann_folder2.glob("*.json")), None)
     if not ann_path:
         print(f"[skip] no annotations for {dataset}")
         return
-
     im_ann = load_json(ann_path) or {}
-    idx = index_images_by_stem(img_folder)
+    idx    = index_images_by_stem(img_folder)
 
-    mask_dir = MASKS_ROOT / dataset;     ensure_dir(mask_dir)
-    ov_dir   = OVERLAYS_ROOT / dataset;  ensure_dir(ov_dir) if OVERLAYS else None
+
+    # write outputs inside the dataset folder
+    mask_dir = img_folder / "masks"
+    ensure_dir(mask_dir)
+    ov_dir   = img_folder / "overlays"
+    ensure_dir(ov_dir)
 
     made = miss = skip = manual = 0
     ov_written = 0
